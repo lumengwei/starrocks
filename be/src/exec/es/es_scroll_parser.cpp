@@ -33,7 +33,7 @@ static const char* FIELD_INNER_HITS = "hits";
 static const char* FIELD_SOURCE = "_source";
 static const char* FIELD_FIELDS = "fields";
 static const char* FIELD_ID = "_id";
-
+static const char* FIELD_SCORE = "_score";
 const char* json_type_to_raw_str(rapidjson::Type type) {
     switch (type) {
     case rapidjson::kNumberType:
@@ -230,6 +230,13 @@ Status ScrollParser::fill_chunk(RuntimeState* state, ChunkPtr* chunk, bool* line
                 const auto& _id = obj[FIELD_ID];
                 Slice slice(_id.GetString(), _id.GetStringLength());
                 _append_data<TYPE_VARCHAR>(column.get(), slice);
+
+                continue;
+            }
+
+             if (slot_desc->col_name() == FIELD_SCORE) {
+                const rapidjson::Value& col = obj[FIELD_SCORE];
+                RETURN_IF_ERROR(_append_value_from_json_val(column.get(), slot_desc->type(), col, pure_doc_value));
 
                 continue;
             }
