@@ -96,21 +96,22 @@ std::string ESScrollQueryBuilder::build(const std::map<std::string, std::string>
         for (auto& select_field : fields) {
              if(select_field == "_score" || select_field == "_id" ){
                 hasScore = select_field == "_score" ;
-                rapidjson::Value field(select_field.c_str(), allocator);
-                source_node.PushBack(field, allocator);
+                //rapidjson::Value field(select_field.c_str(), allocator);
+                //source_node.PushBack(field, allocator);
             }else{
                 rapidjson::Value field(docvalue_context.at(select_field).c_str(), allocator);
                 source_node.PushBack(field, allocator);
             }
-            
+
         }
     } else {
         for (auto& select_field : fields) {
             if(select_field == "_score" || select_field == "_id" ){
                 hasScore = select_field == "_score" ;
+            }else{
+                rapidjson::Value field(select_field.c_str(), allocator);
+                source_node.PushBack(field, allocator);
             }
-            rapidjson::Value field(select_field.c_str(), allocator);
-            source_node.PushBack(field, allocator);
         }
     }
 
