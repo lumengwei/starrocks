@@ -130,8 +130,10 @@ public class EsScanNode extends ScanNode {
         boolean useDocValue = true;
         for (String selectedField : selectedFields) {
             if (!docValueFields.contains(selectedField)) {
-                useDocValue = false;
-                break;
+                if (!docValueFields.contains(selectedField) && !"_score".equals(selectedField) && !"_id".equals(selectedField)) {
+                    useDocValue = false;
+                    break;
+                }
             }
         }
         return useDocValue ? 1 : 0;

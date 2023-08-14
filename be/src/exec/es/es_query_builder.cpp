@@ -268,7 +268,7 @@ BooleanQueryBuilder::BooleanQueryBuilder(const std::vector<ExtPredicate*>& predi
             auto* function_predicate = (ExtFunction*)predicate;
             if ("esquery" == function_predicate->func_name) {
                 auto* es_query = new ESQueryBuilder(*function_predicate);
-                _should_clauses.push_back(es_query);
+                _must_clauses.push_back(es_query);
             };
             break;
         }
@@ -337,7 +337,7 @@ void BooleanQueryBuilder::filter(QueryBuilder* filter) {
     _filter_clauses.push_back(filter);
 }
 void BooleanQueryBuilder::must(QueryBuilder* filter) {
-    _filter_clauses.push_back(filter);
+    _must_clauses.push_back(filter);
 }
 void BooleanQueryBuilder::must_not(QueryBuilder* filter) {
     _must_not_clauses.push_back(filter);
@@ -444,6 +444,7 @@ void BooleanQueryBuilder::to_query(const std::vector<EsPredicate*>& predicates, 
     root->SetObject();
     BooleanQueryBuilder bool_query;
     for (auto es_predicate : predicates) {
+        // LOG(INFO) << "to_query [ " << to_query. << " ]";
         std::vector<ExtPredicate*> or_predicates = es_predicate->get_predicate_list();
         auto* inner_bool_query = new BooleanQueryBuilder(or_predicates);
         bool_query.must(inner_bool_query);

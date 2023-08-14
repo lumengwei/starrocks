@@ -91,16 +91,32 @@ std::string ESScrollQueryBuilder::build(const std::map<std::string, std::string>
     *doc_value_mode = pure_docvalue;
 
     rapidjson::Value source_node(rapidjson::kArrayType);
+     bool hasScore = false;
     if (pure_docvalue) {
         for (auto& select_field : fields) {
-            rapidjson::Value field(docvalue_context.at(select_field).c_str(), allocator);
-            source_node.PushBack(field, allocator);
+             if(select_field == "_score" || select_field == "_id" ){
+                hasScore = select_field == "_score" ;
+                rapidjson::Value field(select_field.c_str(), allocator);
+                source_node.PushBack(field, allocator);
+            }else{
+                rapidjson::Value field(docvalue_context.at(select_field).c_str(), allocator);
+                source_node.PushBack(field, allocator);
+            }
+            
         }
     } else {
         for (auto& select_field : fields) {
+            if(select_field == "_score" || select_field == "_id" ){
+                hasScore = select_field == "_score" ;
+            }
             rapidjson::Value field(select_field.c_str(), allocator);
             source_node.PushBack(field, allocator);
         }
+    }
+
+    // _score 强制算分
+    if(hasScore){
+        es_query_dsl.AddMember("track_scores", "true", allocator);
     }
 
     // just filter the selected fields for reducing the network cost
